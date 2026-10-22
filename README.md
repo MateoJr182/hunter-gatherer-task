@@ -19,3 +19,16 @@ Requires **Python 3.x** and the standard `tkinter` library. No external dependen
 1. Clone the repository:
    ```bash
    git clone [https://github.com/YOUR_USERNAME/hunter-gatherer-task.git](https://github.com/YOUR_USERNAME/hunter-gatherer-task.git)
+
+2. Navigate to the project directory and run the main module:
+   ```bash
+   python main.py
+
+3. Access the settings menu from the initial screen to configure stimulus size, target velocity, and trials per block before registering a participant.
+
+## Data Privacy & Output
+To comply with strict data privacy standards, all participant records and statistical analysis scripts are strictly excluded from version control via .gitignore.
+
+Outputs are generated locally as individual resultados_[ID].csv files, structuring the data as follows for subsequent T-test and correlation analysis:
+   ```bash
+ID_Participante | Genero | Semilla | Juego | Bloque | Intento | Precision | Latencia_ms
