@@ -6,7 +6,7 @@ from vistas_ui import PantallaBienvenida
 
 if __name__ == "__main__":
     root = tk.Tk()
-    root.title("Psico-Informática: Caza vs Recolección")
+    root.title("Caza vs Recolección")
     root.geometry("800x600")
     
     # Inicializar estado global y controlador
