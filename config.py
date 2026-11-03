@@ -15,6 +15,9 @@ class Configuracion:
 
         self.velocidad_pelota = 4  # velocidad base de movimiento
 
+        # Recolección: hojas decorativas en los arbustos (colores distintos a los de los frutos)
+        self.hojas_recoleccion = True
+
     @property
     def total_intentos_por_juego(self):
         return self.intentos_por_bloque * 2

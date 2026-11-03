@@ -9,7 +9,7 @@ Evolutionary psychology posits that prehistoric survival roles exerted distinct 
 
 ## Software Architecture
 The application relies on a modular State Controller pattern to ensure experimental purity:
-* **Deterministic Randomization:** A unique seed generated per participant guarantees consistent exposure pools while avoiding carryover effects.
+* **Deterministic Randomization:** A unique seed is derived from the participant ID (CRC32, stable across runs and machines), so the same ID always yields the same game order and the same trial sequence while avoiding carryover effects. Decorative elements (e.g. bush leaves, scenery) use their own RNG and never consume the seeded sequence.
 * **Automated Fatigue Management:** Mandatory rest periods (1 and 2 minutes) trigger automatically after a set number of trials to mitigate cognitive load.
 * **Asynchronous Logging:** Secure, append-only data registration prevents data loss during execution.
 
