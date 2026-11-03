@@ -46,7 +46,20 @@ class PantallaBienvenida(tk.Frame):
         ).pack(pady=(0, 6))
         Segmentado(
             card, self.genero_var, [("Femenino", "F"), ("Masculino", "M")]
-        ).pack(pady=(0, 22))
+        ).pack(pady=(0, 18))
+
+        tk.Label(
+            card, text="Horas semanales de videojuegos (computador y celular)",
+            font=tema.fuente(11), bg=tema.TARJETA, fg=tema.TEXTO_SUAVE,
+        ).pack(pady=(0, 2))
+        self.campo_horas = CampoTexto(card, ancho=8)
+        self.campo_horas.pack()
+        self.campo_horas.entry.bind("<Return>", lambda e: self.iniciar())
+        self.campo_horas.entry.bind("<Key>", lambda e: self.error_horas.config(text=""))
+        self.error_horas = tk.Label(
+            card, text="", font=tema.fuente(10), bg=tema.TARJETA, fg="#D9534F",
+        )
+        self.error_horas.pack(pady=(2, 10))
 
         Boton(card, "Iniciar experimento", self.iniciar).pack(pady=(0, 6))
 
@@ -62,11 +75,27 @@ class PantallaBienvenida(tk.Frame):
     def iniciar(self):
         nombre = self.campo_nombre.get().strip()
         genero = self.genero_var.get()
+        horas = self._leer_horas()
         if not nombre:
             self.campo_nombre.marcar_error()
+        if horas is None:
+            self.campo_horas.marcar_error()
+            self.error_horas.config(text="Ingresa un número entre 0 y 168 (ej: 10 o 7,5)")
+        if not nombre or horas is None:
             return
         self.pack_forget()
-        self.controlador.iniciar_participante(nombre, genero, self.config_app)
+        self.controlador.iniciar_participante(nombre, genero, self.config_app, horas)
+
+    def _leer_horas(self):
+        """Devuelve las horas como número (acepta coma decimal) o None si no es válido."""
+        texto = self.campo_horas.get().strip().replace(",", ".")
+        try:
+            horas = float(texto)
+        except ValueError:
+            return None
+        if not (0 <= horas <= 168) or horas != horas:  # rango razonable; descarta NaN
+            return None
+        return int(horas) if horas.is_integer() else round(horas, 2)
 
     def abrir_configuraciones(self):
         VentanaConfiguracion(self, self.config_app)

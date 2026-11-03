@@ -12,6 +12,7 @@ class ExperimentController:
         self.root = root
         self.participante_id = None
         self.genero = None
+        self.horas_juego = None
         self.config = None
         self.logger = Logger()
         
@@ -20,9 +21,11 @@ class ExperimentController:
         self.intento_actual = 0
         self.bloque_actual = 1
         
-    def iniciar_participante(self, nombre, genero, config_app):
+    def iniciar_participante(self, nombre, genero, config_app, horas_juego=None):
         self.participante_id = nombre
         self.genero = genero
+        # Covariable de control: horas semanales de videojuegos (computador y celular)
+        self.horas_juego = horas_juego
         self.config = config_app
         
         # hash() de un str cambia en cada ejecución de Python (aleatorización de hashes),
@@ -50,7 +53,7 @@ class ExperimentController:
         self.logger.registrar(
             self.participante_id, self.genero, self.semilla_actual, 
             juego, self.bloque_actual, self.intento_actual + 1, 
-            precision, latencia
+            precision, latencia, self.horas_juego
         )
         
         # Guardar en memoria para el resumen final
@@ -101,6 +104,7 @@ class ExperimentController:
         self.limpiar_pantalla()
         self.participante_id = None
         self.genero = None
+        self.horas_juego = None
         self.intento_actual = 0
         self.bloque_actual = 1
         self.resultados_memoria = {"recoleccion": [], "caza": []}

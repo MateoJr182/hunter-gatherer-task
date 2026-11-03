@@ -14,9 +14,9 @@ class Logger:
             with open(self.filename, mode='w', newline='') as file:
                 writer = csv.writer(file)
                 # Nueva columna: Semilla
-                writer.writerow(["ID_Participante", "Genero", "Semilla", "Juego", "Bloque", "Intento", "Precision", "Latencia_ms"])
+                writer.writerow(["ID_Participante", "Genero", "Semilla", "Juego", "Bloque", "Intento", "Precision", "Latencia_ms", "Horas_Juego_Semana"])
 
-    def registrar(self, p_id, genero, semilla, juego, bloque, intento, precision, latencia):
+    def registrar(self, p_id, genero, semilla, juego, bloque, intento, precision, latencia, horas_juego=""):
         with open(self.filename, mode='a', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow([p_id, genero, semilla, juego, bloque, intento, precision, round(latencia, 2)])
+            writer.writerow([p_id, genero, semilla, juego, bloque, intento, precision, round(latencia, 2), horas_juego])
