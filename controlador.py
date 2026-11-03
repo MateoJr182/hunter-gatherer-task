@@ -1,6 +1,7 @@
 # controlador.py
 import random
 import tkinter as tk
+import zlib
 from logger import Logger
 from vistas_ui import PantallaDescanso, PantallaFin
 from juego_recoleccion import JuegoRecoleccion
@@ -24,7 +25,9 @@ class ExperimentController:
         self.genero = genero
         self.config = config_app
         
-        self.semilla_actual = hash(self.participante_id)
+        # hash() de un str cambia en cada ejecución de Python (aleatorización de hashes),
+        # así que se usa CRC32: mismo ID -> misma semilla -> mismo orden y mismos ensayos.
+        self.semilla_actual = zlib.crc32(str(self.participante_id).encode("utf-8"))
         random.seed(self.semilla_actual)
         self.logger.set_participante(self.participante_id)
         
@@ -58,7 +61,7 @@ class ExperimentController:
 
     def limpiar_pantalla(self):
         for widget in self.root.winfo_children():
-            widget.pack_forget()
+            widget.destroy()
 
     def evaluar_flujo(self):
         if self.intento_actual == self.config.total_intentos_por_juego:

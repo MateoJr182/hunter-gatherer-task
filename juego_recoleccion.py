@@ -5,18 +5,25 @@ import time
 import math
 
 
+# Colores de hojas: tonos apagados (salvia, oliva claro, verde agua, caqui) elegidos para quedar
+# lejos de TODOS los colores de frutos (rojo, azul, morado, naranja, verde) y del fondo.
+# Distancia perceptual (CIELAB) mínima a cualquier fruto: ΔE > 40.
+COLORES_HOJA = ["#A8C3A0", "#C3CA94", "#8FB5A8", "#D9D1A0", "#B9C9B0", "#A5BFA3"]
+
+
 class JuegoRecoleccion(tk.Frame):
     def __init__(self, parent, controlador):
         super().__init__(parent)
         self.controlador = controlador
-        self.canvas = tk.Canvas(self, bg="#F5F2EB")
+        self.canvas = tk.Canvas(self, bg="#F5F2EB", highlightthickness=0)
         self.canvas.pack(expand=True, fill=tk.BOTH)
         self.start_time = 0
         self.posiciones_ramas = []
+        self.segmentos_ramas = []
 
     def iniciar(self):
         self.canvas.delete("all")
-        self.canvas.update()
+        self.canvas.update_idletasks()
         ancho = self.canvas.winfo_width()
         alto = self.canvas.winfo_height()
 
@@ -24,6 +31,7 @@ class JuegoRecoleccion(tk.Frame):
             ancho, alto = 800, 600
 
         self.posiciones_ramas = []
+        self.segmentos_ramas = []
 
         # 1. Generar 2 arbustos masivos que se expandan por toda la pantalla
         posiciones_base = [
@@ -43,6 +51,11 @@ class JuegoRecoleccion(tk.Frame):
                 profundidad=6,  # Mayor profundidad para más ramas
                 grosor=14,  # Base gruesa
             )
+
+        # Hojas: se dibujan antes que los frutos (quedan debajo) y con un RNG propio,
+        # para no alterar la secuencia aleatoria global determinada por la semilla.
+        if getattr(self.controlador.config, "hojas_recoleccion", True):
+            self.dibujar_hojas()
 
         r = self.controlador.config.radio_pelota
         d = r * 2
@@ -161,6 +174,8 @@ class JuegoRecoleccion(tk.Frame):
             capstyle=tk.ROUND,
         )
 
+        self.segmentos_ramas.append((x, y, x_fin, y_fin, angulo, profundidad))
+
         # Extraemos múltiples puntos a lo largo de la rama para tener más opciones viables
         self.posiciones_ramas.append((x_fin, y_fin))
         self.posiciones_ramas.append((x + (x_fin - x) * 0.33, y + (y_fin - y) * 0.33))
@@ -183,6 +198,32 @@ class JuegoRecoleccion(tk.Frame):
                 profundidad - 1,
                 nuevo_grosor,
             )
+
+    def dibujar_hojas(self):
+        # Semilla derivada de la geometría de los arbustos: mismo arbusto -> mismas hojas
+        semilla = int(sum(s[2] + s[3] for s in self.segmentos_ramas) * 1000) % (2**32)
+        rng = random.Random(semilla)
+
+        for x, y, x_fin, y_fin, angulo, prof in self.segmentos_ramas:
+            if prof > 4:  # solo en las ramas más finas / externas
+                continue
+            for _ in range(2):
+                t = rng.uniform(0.35, 1.0)
+                bx = x + (x_fin - x) * t
+                by = y + (y_fin - y) * t
+                ang = angulo + rng.choice([-1, 1]) * rng.uniform(0.5, 1.2)
+                largo = rng.uniform(13, 22)
+                ancho = largo * 0.45
+                forma = [(0, 0), (0.3, -0.5), (0.7, -0.4), (1, 0), (0.7, 0.4), (0.3, 0.5)]
+                ca, sa = math.cos(ang), math.sin(ang)
+                pts = []
+                for u, v in forma:
+                    lx, ly = u * largo, v * ancho * 2
+                    pts += [bx + lx * ca - ly * sa, by + lx * sa + ly * ca]
+                self.canvas.create_polygon(
+                    pts, fill=rng.choice(COLORES_HOJA), outline="", smooth=True,
+                    tags=("arbusto", "hoja"),  # clic en una hoja cuenta como fallo, igual que una rama
+                )
 
     def acierto(self, event):
         latencia = (time.time() - self.start_time) * 1000
