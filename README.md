@@ -31,4 +31,4 @@ To comply with strict data privacy standards, all participant records and statis
 
 Outputs are generated locally as individual resultados_[ID].csv files, structuring the data as follows for subsequent T-test and correlation analysis:
    ```bash
-ID_Participante | Genero | Semilla | Juego | Bloque | Intento | Precision | Latencia_ms
+ID_Participante | Genero | Semilla | Juego | Bloque | Intento | Precision | Latencia_ms | Horas_Juego_Semana
